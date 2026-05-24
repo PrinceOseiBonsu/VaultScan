@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VaultScan — Scanning...</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f4f8;
+            color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container { max-width: 500px; width: 90%; text-align: center; }
+
+        .shield {
+            font-size: 72px;
+            margin-bottom: 24px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        h1 { font-size: 28px; font-weight: 800; color: #1a1a2e; margin-bottom: 8px; }
+        p.subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 40px; }
+
+        .progress-wrap {
+            background: #e2e8f0;
+            border-radius: 100px;
+            height: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 100px;
+            background: linear-gradient(90deg, #e94560, #0f3460);
+            animation: progress 10s ease forwards;
+            width: 0%;
+        }
+        @keyframes progress { 0% { width: 0%; } 90% { width: 90%; } }
+
+        .step-text {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 40px;
+            min-height: 20px;
+        }
+
+        .checks {
+            background: #fff;
+            border-radius: 20px;
+            padding: 8px 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            text-align: left;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: color 0.3s;
+        }
+        .check-item:last-child { border-bottom: none; }
+        .check-item.done { color: #1a1a2e; font-weight: 600; }
+        .check-icon { font-size: 18px; width: 24px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="shield">🛡️</div>
+        <h1>Scanning Your System</h1>
+        <p class="subtitle">Please wait while VaultScan audits your security</p>
+
+        <div class="progress-wrap">
+            <div class="progress-fill"></div>
+        </div>
+
+        <div class="step-text" id="stepText">Initializing scan...</div>
+
+        <div class="checks">
+            <div class="check-item" id="check1">
+                <span class="check-icon">⏳</span>
+                <span>Gathering system information</span>
+            </div>
+            <div class="check-item" id="check2">
+                <span class="check-icon">⏳</span>
+                <span>Scanning open ports</span>
+            </div>
+            <div class="check-item" id="check3">
+                <span class="check-icon">⏳</span>
+                <span>Checking vulnerabilities</span>
+            </div>
+            <div class="check-item" id="check4">
+                <span class="check-icon">⏳</span>
+                <span>Calculating risk score</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const delays = [1000, 2500, 5000, 7000];
+        delays.forEach((delay, i) => {
+            setTimeout(() => {
+                const el = document.getElementById(`check${i+1}`);
+                el.classList.add('done');
+                el.querySelector('.check-icon').textContent = '✅';
+            }, delay);
+        });
+
+        function checkStatus() {
+            fetch('/status')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.step) {
+                        document.getElementById('stepText').textContent = data.step;
+                    }
+                    if (data.complete) {
+                        window.location.href = '/report';
+                    } else {
+                        setTimeout(checkStatus, 1000);
+                    }
+                });
+        }
+        setTimeout(checkStatus, 1000);
+    </script>
+</body>
+</html>
